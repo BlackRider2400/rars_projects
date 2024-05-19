@@ -19,8 +19,8 @@ main:
 	#bits per pixel 2B 0x08
 	#czarny 2B 0x00 0x00
 	#biały 2B 0xFF 0xFF
-	li t5, 300 #elipse_a
-	li t6, 200 #elipse_b
+	li t5, 30 #elipse_a
+	li t6, 20 #elipse_b
 	#calculating width
 	mv s1, t5
 	slli s1, s1, 1
@@ -35,7 +35,6 @@ main:
 	slli s10, s10, 1
 	add s10, s2, s10
 	addi s10, s10, 0x1A
-	
 	
 	la t0, headerBuffer #iterator on buffer address
 	li t1, 'B'
@@ -92,10 +91,9 @@ main:
 	#s9 is pixel array size
 	#adding one to width
 	addi s1, s1, 1
-	mv s9, s1
-	mul s9, s9, s2
-	mv a0, s9
+	mul s9, s1, s2
 	slli s9, s9, 1
+	mv a0, s9
 	li a7, 9
 	ecall
 	mv s11, a0
@@ -124,14 +122,19 @@ main:
 	sub t2, t2, t3
 	add t2, t2, s6
 	
+	#set color ff1493
+	li s10, 0xF852	
+	#color
+	li s10, 0xFF55
+	
+	#addi t5, t5, 1
 	
 	
 loop_1:
 	mul s0, t0, s8
-	mul s10, t1, s7
-	bgt s0, s10, set_d2
+	mul t3, t1, s7
+	bgt s0, t3, set_d2
 	#write
-	li s10, 0xFF55	
 	#1
 	add s0, t1, t6
 	mul s0, s0, s1
@@ -186,10 +189,11 @@ set_d2:
 	add t2, t2, s0
 	mul s0, s5, s6
 	sub t2, t2, s0
+	#set color
+	li s10, 0xF852	
 loop_2:
 	bltz t1, end
 	#write
-	li s10, 0xF852	
 	#1
 	add s0, t1, t6
 	mul s0, s0, s1
