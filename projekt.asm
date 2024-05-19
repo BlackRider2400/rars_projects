@@ -19,8 +19,8 @@ main:
 	#bits per pixel 2B 0x08
 	#czarny 2B 0x00 0x00
 	#biały 2B 0xFF 0xFF
-	li t5, 30 #elipse_a
-	li t6, 20 #elipse_b
+	li t5, 300 #elipse_a
+	li t6, 200 #elipse_b
 	#calculating width
 	mv s1, t5
 	slli s1, s1, 1
@@ -90,8 +90,9 @@ main:
 	
 	#now creating pixel array
 	#s9 is pixel array size
+	#adding one to width
+	addi s1, s1, 1
 	mv s9, s1
-	addi s9, s9, 1
 	mul s9, s9, s2
 	mv a0, s9
 	slli s9, s9, 1
@@ -123,15 +124,14 @@ main:
 	sub t2, t2, t3
 	add t2, t2, s6
 	
-	#adding one to width
-	addi s1, s1, 1
+	
 	
 loop_1:
 	mul s0, t0, s8
 	mul s10, t1, s7
 	bgt s0, s10, set_d2
 	#write
-	li s10, 0xFFFF	
+	li s10, 0xFF55	
 	#1
 	add s0, t1, t6
 	mul s0, s0, s1
@@ -185,11 +185,11 @@ set_d2:
 	mul s0, s5, s0
 	add t2, t2, s0
 	mul s0, s5, s6
-	add t2, t2, s0
+	sub t2, t2, s0
 loop_2:
 	bltz t1, end
-		#write
-	li s10, 0xFFFF	
+	#write
+	li s10, 0xF852	
 	#1
 	add s0, t1, t6
 	mul s0, s0, s1
@@ -224,7 +224,7 @@ loop_2:
 	sh s10, (s0)
 	#end of write
 	mul t3, s7, t1
-	add t3, t3, s5
+	sub t3, s5, t3
 	addi t1, t1, -1
 	bgtz t2, post_2
 	addi t0, t0, 1
