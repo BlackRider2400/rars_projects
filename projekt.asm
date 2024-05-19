@@ -19,8 +19,8 @@ main:
 	#bits per pixel 2B 0x08
 	#czarny 2B 0x00 0x00
 	#biały 2B 0xFF 0xFF
-	li t5, 8 #elipse_a
-	li t6, 8 #elipse_b
+	li t5, 30 #elipse_a
+	li t6, 20 #elipse_b
 	#calculating width
 	mv s1, t5
 	slli s1, s1, 1
@@ -85,7 +85,11 @@ main:
 	li t1, 0x10
 	sh t1, (t0)
 	addi t0, t0, 2
+	
+	#end of data in header
+	
 	#now creating pixel array
+	#s9 is pixel array size
 	mv s9, s1
 	addi s9, s9, 1
 	mul s9, s9, s2
@@ -95,23 +99,141 @@ main:
 	ecall
 	mv s11, a0
 	
-	#end of data in header
+	#setting for start
+	#x
+	li t0, 0
+	#y
+	mv t1, t6
+	#a2
+	mv s5, t5
+	mul s5, s5, s5
+	#b2
+	mv s6, t6
+	mul s6, s6, s6
+	# fa2
+	mv s7, s5
+	slli s7, s7, 2
+	# fb2
+	mv s8, s6
+	slli s8, s8, 2
 	
-	li t2, 0
-	mv t3, s9
-	mv t0, s11
-begin:	
-	beq t2, t3, end
-	li t1, 0xFFFF
-	sh t1, (t0)
-	addi t2, t2, 1
-	addi t0, t0, 2
-	beq t2, t3, end
-	li t1, 0x0000
-	sh t1, (t0)
-	addi t2, t2, 1
-	addi t0, t0, 2
-	j begin
+	#d1 t2
+	mul t3, t5, s5
+	srai t2, s5, 2
+	sub t2, t2, t3
+	add t2, t2, s6
+	
+	#adding one to width
+	addi s1, s1, 1
+	
+loop_1:
+	mul s0, t0, s8
+	mul s10, t1, s7
+	bgt s0, s10, set_d2
+	#write
+	li s10, 0xFFFF	
+	#1
+	add s0, t1, t6
+	mul s0, s0, s1
+	add s0, s0, t0
+	add s0, s0, t5
+	slli s0, s0, 1
+	add s0, s0, s11
+	sh s10, (s0)
+	#2
+	add s0, t1, t6
+	mul s0, s0, s1
+	sub s0, s0, t0
+	add s0, s0, t5
+	slli s0, s0, 1
+	add s0, s0, s11
+	sh s10, (s0)
+	#3
+	sub s0, t6, t1
+	mul s0, s0, s1
+	add s0, s0, t0
+	add s0, s0, t5
+	slli s0, s0, 1
+	add s0, s0, s11
+	sh s10, (s0)
+	#4
+	sub s0, t6, t1
+	mul s0, s0, s1
+	sub s0, s0, t0
+	add s0, s0, t5
+	slli s0, s0, 1
+	add s0, s0, s11
+	sh s10, (s0)
+	#end of write
+	addi t0, t0, 1
+	mul t3, t0, s8
+	add t3, t3, s6
+	bltz t2, post1
+	addi, t1, t1, -1
+	mul s0, t1, s7
+	sub t3, t3, s0
+post1:
+	add t2, t2, t3
+	j loop_1
+set_d2:
+	#d2 t2
+	addi t3, t0, 1
+	mul t2, t3, t3
+	mul t2, t2, s6
+	addi t3, t1, -1
+	mul s0, t3, t3
+	mul s0, s5, s0
+	add t2, t2, s0
+	mul s0, s5, s6
+	add t2, t2, s0
+loop_2:
+	bltz t1, end
+		#write
+	li s10, 0xFFFF	
+	#1
+	add s0, t1, t6
+	mul s0, s0, s1
+	add s0, s0, t0
+	add s0, s0, t5
+	slli s0, s0, 1
+	add s0, s0, s11
+	sh s10, (s0)
+	#2
+	add s0, t1, t6
+	mul s0, s0, s1
+	sub s0, s0, t0
+	add s0, s0, t5
+	slli s0, s0, 1
+	add s0, s0, s11
+	sh s10, (s0)
+	#3
+	sub s0, t6, t1
+	mul s0, s0, s1
+	add s0, s0, t0
+	add s0, s0, t5
+	slli s0, s0, 1
+	add s0, s0, s11
+	sh s10, (s0)
+	#4
+	sub s0, t6, t1
+	mul s0, s0, s1
+	sub s0, s0, t0
+	add s0, s0, t5
+	slli s0, s0, 1
+	add s0, s0, s11
+	sh s10, (s0)
+	#end of write
+	mul t3, s7, t1
+	add t3, t3, s5
+	addi t1, t1, -1
+	bgtz t2, post_2
+	addi t0, t0, 1
+	mul s0, s8, t0
+	add t3,t3, s0
+post_2:
+	add t2, t2, t3
+	j loop_2
+	
 end:
 	###############################################################
 	#Just writing header
