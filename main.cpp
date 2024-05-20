@@ -49,8 +49,8 @@ int main() {
     char b {'B'};
     char m {'M'};
 
-    uint16_t elipse_a {30};
-    uint16_t elipse_b {20};
+    uint16_t elipse_a {300};
+    uint16_t elipse_b {300};
 
     int16_t padding_a {0};
     int16_t padding_b {0};

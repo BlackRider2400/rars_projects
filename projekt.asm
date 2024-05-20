@@ -19,8 +19,8 @@ main:
 	#bits per pixel 2B 0x08
 	#czarny 2B 0x00 0x00
 	#biały 2B 0xFF 0xFF
-	li t5, 30 #elipse_a
-	li t6, 20 #elipse_b
+	li t5, 400 #elipse_a
+	li t6, 200 #elipse_b
 	#calculating width
 	mv s1, t5
 	slli s1, s1, 1
@@ -104,28 +104,22 @@ main:
 	#y
 	mv t1, t6
 	#a2
-	mv s5, t5
-	mul s5, s5, s5
+	mul s5, t5, t5
 	#b2
-	mv s6, t6
-	mul s6, s6, s6
+	mul s6, t6, t6
 	# fa2
-	mv s7, s5
-	slli s7, s7, 2
+	slli s7, s5, 2
 	# fb2
-	mv s8, s6
-	slli s8, s8, 2
+	slli s8, s6, 2
 	
 	#d1 t2
-	mul t3, t5, s5
+	mul t3, t6, s5
 	srai t2, s5, 2
 	sub t2, t2, t3
 	add t2, t2, s6
 	
-	#set color ff1493
-	li s10, 0xF852	
-	#color
-	li s10, 0xFF55
+	#set color ff1493 F852 or white ffff
+	li s10, 0xF852
 	
 	#addi t5, t5, 1
 	
@@ -184,13 +178,12 @@ set_d2:
 	mul t2, t3, t3
 	mul t2, t2, s6
 	addi t3, t1, -1
-	mul s0, t3, t3
-	mul s0, s5, s0
-	add t2, t2, s0
-	mul s0, s5, s6
-	sub t2, t2, s0
-	#set color
-	li s10, 0xF852	
+	mul t3, t3, t3
+	mul t3, t3, s5
+	add t2, t2, t3
+	mul t3, s5, s6
+	sub t2, t2, t3
+	
 loop_2:
 	bltz t1, end
 	#write
@@ -227,9 +220,9 @@ loop_2:
 	add s0, s0, s11
 	sh s10, (s0)
 	#end of write
+	addi t1, t1, -1
 	mul t3, s7, t1
 	sub t3, s5, t3
-	addi t1, t1, -1
 	bgtz t2, post_2
 	addi t0, t0, 1
 	mul s0, s8, t0
